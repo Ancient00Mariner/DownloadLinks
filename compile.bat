@@ -1,3 +1,3 @@
 echo off
-pyinstaller --onefile --windowed --noconfirm --icon=SEPfield.ico DownloadLinks.py
+pyinstaller --onefile --icon=SEPfield.ico DownloadLinks.py
 pause

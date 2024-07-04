@@ -106,7 +106,7 @@ def download():
         print("Phrase to grep for?")
         phrase= input()
         print("Checking bookmarks at " + path)
-        links = [line.rstrip('\n') for line in pygrep.pygrep(phrase, path, 0)]
+        links = [line.rstrip('\n') for line in pygrep.pygrep(phrase, path)]
         if checkLinks(links) == True:
             print("Video, Audio, or Check format? (v, a, or c)")
             tog = input()

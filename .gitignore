@@ -1,6 +1,6 @@
 DownloadLinksMyOWN.py
 DownloadLinksMyOWN.spec
 compileMYOWN.bat
-__pycache__
 build
 dist
+*.spec
