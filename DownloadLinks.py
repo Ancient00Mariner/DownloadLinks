@@ -4,28 +4,17 @@ with all unwanted bookmarks and header tags removed with grep
 (it's probably porn)
 
 Author: Me
-Version: 2.0
-Date: 8sep2019
+Version: 3.0
+Date: 30Apr2024
 
 TODO:
-***VERY IMPORTANT***
-youtube-dl is orphaned. use yt-dlp instead. The only relevent
-changes should be in the import statement and in
-downloadBookmarks() when the constructor is called. This line
-will be changed from 
-with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-to
-with yt-dlp.YoutubeDL(ydl_opts) as ydl:
-
-also maybe eliminate this change by changing import statement
-to 
-from yt-dlp import YoutubeDL()
-idk if this would break the program though
+THIS DOESN'T WORK IN LINUX. The path to Chrome bookmarks is in Windows format, so the program loses it's mind if you run it in linux.
 """
 
 from __future__ import unicode_literals
-import youtube_dl, os, pygrep, sys, datetime, platform, ffmpeg
+import os, pygrep, sys, datetime, platform, ffmpeg
 from countdowntimer import *
+from yt_dlp import YoutubeDL
 
 #For use with pyinstaller
 #Requires sys and os Libraries
@@ -40,10 +29,9 @@ def resource_path(relative_path):
 
 #os.chdir(os.path.dirname(__file__)) # for my own use
 #print(os.getcwd())
-# set to 0 for normal operation. 1 for test settings -> downloads a prebookmarked youtube link, then closes program.  Also checks existence of file structure for more questionable downloads (porn)
+# set to 0 for normal operation. 1 for test settings -> downloads a prebookmarked youtube link, then closes program.
 test = 0
 
-pornpath = "\WHAT\FLASH\\" + str(datetime.datetime.now().year)
 path = os.environ['USERPROFILE'] + r"\AppData\Local\Google\Chrome\User Data\Default\Bookmarks"
 
 
@@ -61,9 +49,9 @@ def checkLinks(links):
         return True
     
 def testing():
-    links = [line.rstrip('\n') for line in pygrep.pygrep("youtube", path, 0)]
+    links = [line.rstrip('\n') for line in pygrep.pygrep("youtube", path)]
     if checkLinks(links) == True:
-        downloadBookmarks(links, setOpts(""))
+        downloadBookmarks(links, setOpts("c"))
     else:
         exitProg()
         
@@ -72,7 +60,7 @@ def downloadBookmarks(links, ydl_opts):
     for n in links:
         url = n.split('\"')[3]
         print("\ndownloading video " + str(count) + " of " + str(len(links)))
-        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        with YoutubeDL(ydl_opts) as ydl:
             count += 1
             try:
                 ydl.download([url])
@@ -106,30 +94,6 @@ def setOpts(tog):
             'preferredquality': '192',
             }],
         'outtmpl': './' + foldername + '/%(title)s.%(ext)s'}
-    elif tog == "":  #the porn part. only works for my computer
-        print("Drive Location?")
-        loc = input()
-        loc = loc + ":"
-        if os.path.isdir(loc):
-            fullpath = loc + pornpath
-            print(loc + " Drive found")
-            if os.path.isdir(fullpath):
-                print(fullpath + " Directory found")
-                os.chdir(fullpath)
-            else:
-                print("Directory " + fullpath + " not found. Creating")
-                os.makedirs(fullpath)
-                os.chdir(fullpath)
-            if test == 0:
-                opts = {'format': 'worst',
-                'outtmpl': fullpath + '\\%(title)s.%(ext)s'}
-            else:
-    #           For Testing
-                opts = {'listformats': True}
-        else:
-            print(loc + " Drive not found")
-            if test == 0:
-                exitProg()
     else:
         print("command not found")
         exitProg()
